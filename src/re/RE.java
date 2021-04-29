@@ -2,15 +2,14 @@ package re;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-
 import fa.State;
 import fa.nfa.NFA;
 import fa.nfa.NFAState;
 
 /**
- * Constructs an NFA for a given regular expression
- *
+ * Creates an NFA from a given regular expression
+ * Authors: Taylor Nielson and Samantha Farmer
+ * CS361
  */
 public class RE implements REInterface {
 	String regEx = "";
@@ -18,14 +17,14 @@ public class RE implements REInterface {
 	
 	/**
 	 * Constructor
-	 * @param regEx String of the regular expression
+	 * @param regEx String from the regular expression
 	 */
 	public RE(String regEx) {
 		this.regEx = regEx;
 	}
 
 	/**
-	 * @return The NFA built from the regular expression
+	 * @return NFA built from a regular expression
 	 */
 	public NFA getNFA() {
 		return regEx();
@@ -38,41 +37,37 @@ public class RE implements REInterface {
 	private NFA regEx() {
 		NFA term = term();
 
-		//If the regex requires a union operation
+		//If the regEx needs a union operation
 		if (more() && peek() == '|') {
 
 			eat ('|') ;
 			NFA regex = regEx() ;
 			//now create a union of term and regex NFA
-			//1. create a new NFA
+			//new NFA
 			NFA nfa = new NFA();
-			//create a start state for it
+			//build state requirements(start, and other nfa states)
 			String startName = "q" + stateCounter;
 			stateCounter++;
 			nfa.addStartState(startName);
-
-			//add all states from other NFAS
 			nfa.addNFAStates(term.getStates());
 			nfa.addNFAStates(regex.getStates());
-
-			//add the transitions between startName and startStates of other two NFAs
-			nfa.addTransition(startName, 'e', term.getStartState().getName());
+			//transitions
 			nfa.addTransition(startName, 'e', regex.getStartState().getName());
-
-			//add the alphabets of the other two NFAs to new NFA
+			nfa.addTransition(startName, 'e', term.getStartState().getName());
+			//add alphabets
 			nfa.addAbc(term.getABC());
 			nfa.addAbc(regex.getABC());
 
 			return nfa;
-
-		//If no union is needed, just return the simple NFA
-		} else {
+		} 
+		//else return NFA
+		else {
 			return term;
 		}
 	}
 
 	/**
-	 * Looks at the regex to determine what it needs to build
+	 * Analyzes regEx to determine what needs to be created
 	 * @return parsed portion of the regex in the form of an NFA
 	 */
 	private NFA term() {
