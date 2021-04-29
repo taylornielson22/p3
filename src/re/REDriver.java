@@ -24,7 +24,7 @@ public class REDriver {
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		//The file name is passed as an argument
-				String fileName = "p3tc1.txt";
+				String fileName = args[0];
 				File file = new File(fileName);
 				if(file.exists()){
 					Scanner scan = new Scanner(file);

@@ -14,6 +14,7 @@ import fa.nfa.NFAState;
 public class RE implements REInterface {
 	String regEx = "";
 	int stateCounter = 1;
+	String finalState;
 	
 	/**
 	 * Constructor
@@ -133,10 +134,10 @@ public class RE implements REInterface {
 
 	/**
 	 * Handles the star operator with a union
-	 * @param root - NFA we are building upon
+	 * @param base - NFA we are building upon
 	 * @return NFA - the previous NFA has now incorporated the star operator
 	 */
-	private NFA star(NFA root) {
+	private NFA star(NFA base) {
 
 		NFA union = new NFA();
 		
@@ -146,36 +147,40 @@ public class RE implements REInterface {
 		union.addStartState(start);
 		
 		//Make new final state
-		String finState = "q" + stateCounter;
+		finalState = "q" + stateCounter;
 		stateCounter++;
-		union.addFinalState(finState);
+		union.addFinalState(finalState);
 		
 		//Add all states from root to new NFA
-		union.addNFAStates(root.getStates());
+		union.addNFAStates(base.getStates());
 		
 		//Add empty transitions because star allows for 0 occurrences of term/NFA
-		union.addTransition(start, 'e', finState);
-		union.addTransition(finState, 'e', root.getStartState().getName());
+		union.addTransition(start, 'e', finalState);
+		union.addTransition(finalState, 'e', base.getStartState().getName());
 		
 		//Tie new start to root NFA
-		union.addTransition(start, 'e', root.getStartState().getName());
+		union.addTransition(start, 'e', base.getStartState().getName());
 		
 		//Make sure old alphabet is included
-		union.addAbc(root.getABC());
+		union.addAbc(base.getABC());
 		
+		setFinal(union, base);
+		
+		
+    	return union;
+	}
+	
+	public void setFinal(NFA union, NFA base) {
 		//Add empty transitions from old final states to new final state
-		for(State state: root.getFinalStates()) {
-			union.addTransition(state.getName(), 'e', finState);
-			
+		for(State state: base.getFinalStates()) {
+			union.addTransition(state.getName(), 'e', finalState);
 			//Make sure new final is the only final state in new NFA
-			for(State s2: union.getFinalStates()){
+			for(State s2: base.getFinalStates()){
 				if(s2.getName().equals(state.getName())) {
 					((NFAState)s2).setNonFinal();
 				}
 			}
 		}
-
-    	return union;
 	}
 
 	/**
