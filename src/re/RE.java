@@ -91,37 +91,40 @@ public class RE implements REInterface {
 	 * @return NFA that has been concatenated
 	 */
 	private NFA connect(NFA reg1, NFA reg2) {
+		
+		//Check if there are no more operations
 		if(reg1.getStates().isEmpty()) {
 			return reg2;
 		}
-		//Get final states and name of start state in second NFA
+		
+		//get final states and name of start state in reg2
 		String reg2Start = reg2.getStartState().getName();
 		Set<State> reg1Finals = reg1.getFinalStates();
 
-		//Add all states from second NFA to first NFA
+		//add all states from reg2 to reg1
 		reg1.addNFAStates(reg2.getStates());
 		
-		//Make sure first NFA's final states are not final
-		//But add their transitions to begining of second NFA
+		//set all reg1 final states are not final
+		//add reg1 transitions to beginning of reg2
 		for(State state: reg1Finals) {
 			((NFAState)state).setNonFinal();
 			reg1.addTransition(state.getName(), 'e', reg2Start);
 		}
 		
-		//Make sure both alphabets are included
+		//connect both alphabets
 		reg1.addAbc(reg2.getABC());
 		
 		return reg1;
 	}
 
 	/**
-	 * A factor is a base followed by a possibly empty sequence of '*'.
-	 * @return root NFA or root with the star operator if the regex has a '*'
+	 * A factor is a base followed by a possibly empty sequence of *.
+	 * @return root NFA or root with the star operator if the regex has a *
 	 */
 	private NFA factor() {
 		NFA base = base();
 		
-		//If star op is needed, descend into recursion
+		//if star operation is needed, use recursion
 		while(more() && peek() == '*'){
 			eat('*');
 			base = star(base);
@@ -130,48 +133,48 @@ public class RE implements REInterface {
 	}
 
 	/**
-	 * Handles the star operator with a union
-	 * @param base - NFA we are building upon
-	 * @return NFA - the previous NFA has now incorporated the star operator
+	 * Handles the * operator with a union
+	 * @param base - NFA we are building
+	 * @return NFA - the previous NFA thats using the star operator
 	 */
 	private NFA star(NFA base) {
 
 		NFA union = new NFA();
 		
-		//Make new start state
+		//start state
 		String start = "q" + stateCounter;
 		stateCounter++;
 		union.addStartState(start);
 		
-		//Make new final state
+		//final state
 		finalState = "q" + stateCounter;
 		stateCounter++;
 		union.addFinalState(finalState);
 		
-		//Add all states from root to new NFA
+		//add all states from root to new NFA
 		union.addNFAStates(base.getStates());
 		
-		//Add empty transitions because star allows for 0 occurrences of term/NFA
+		//add empty transitions/ * = no terms
 		union.addTransition(start, 'e', finalState);
 		union.addTransition(finalState, 'e', base.getStartState().getName());
 		
-		//Tie new start to root NFA
+		//make new start state the same start for root NFA
 		union.addTransition(start, 'e', base.getStartState().getName());
 		
-		//Make sure old alphabet is included
+		//include old alphabet
 		union.addAbc(base.getABC());
-		
 		setFinal(union, base);
-		
-		
+	
     	return union;
 	}
 	
 	public void setFinal(NFA union, NFA base) {
-		//Add empty transitions from old final states to new final state
+		
+		//add empty transitions to new final state
 		for(State state: base.getFinalStates()) {
 			union.addTransition(state.getName(), 'e', finalState);
-			//Make sure new final is the only final state in new NFA
+			
+			//new final states is only final state
 			for(State s2: base.getFinalStates()){
 				if(s2.getName().equals(state.getName())) {
 					((NFAState)s2).setNonFinal();
@@ -203,7 +206,7 @@ public class RE implements REInterface {
 	private NFA symbol(char c) {
 		NFA nfa = new NFA();
 		
-		//Make a new NFA of 2 states and a transition on input char
+		//creates a new NFA of 2 states and a transition on input char
 		String s = "q" + stateCounter++;
 		nfa.addStartState(s);
 		String f = "q" + stateCounter++;
@@ -219,7 +222,7 @@ public class RE implements REInterface {
 	}
 
 	/**
-	 * Peeks at the first index(current character) of the regEx 
+	 * looks at the current character of the regEx 
 	 * @return The next unprocessed character in the regEx
 	 */
 	private char peek(){
@@ -227,8 +230,8 @@ public class RE implements REInterface {
 	}
 	
 	/**
-	 * Checks if input char is the current character, and will remove it if so.
-	 * @param c Character to process
+	 * Checks if input is the current character, will remove if true.
+	 * @param c 
 	 */
 	private void eat(char c){
 		if(peek() == c){
@@ -240,7 +243,7 @@ public class RE implements REInterface {
 	
 	/**
 	 * Removes current character from regEx and returns the next current character
-	 * @return the character that was processed
+	 * @return c
 	 */
 	private char next(){
 		char c = peek();
@@ -249,7 +252,7 @@ public class RE implements REInterface {
 	}
 	
 	/**
-	 * Returns true if there are more characters to read in regEx
+	 * If more characters, return true
 	 * @return boolean
 	 */
 	private boolean more(){
