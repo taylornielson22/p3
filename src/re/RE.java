@@ -77,18 +77,12 @@ public class RE implements REInterface {
 		while( more() && peek() != ')' && peek() != '|'){
 			NFA fact = factor();
 			
-			//If RE tries to process regex and there no operations to perform, just return simplest NFA
-			if(factor.getStates().isEmpty()){
-				factor = fact;
-			//If there are multiple terms following each other, perform concatenate operation on the NFAs
-			}else{
-				factor = connect(factor, fact);
-
-			}
+			factor = connect(factor,fact);
 		}
 		
 		return factor;
 	}
+	
 	
 	/**
 	 * Concatenates the two NFAs, when two NFAs are in the regex together
@@ -97,6 +91,9 @@ public class RE implements REInterface {
 	 * @return NFA that has been concatenated
 	 */
 	private NFA connect(NFA reg1, NFA reg2) {
+		if(reg1.getStates().isEmpty()) {
+			return reg2;
+		}
 		//Get final states and name of start state in second NFA
 		String reg2Start = reg2.getStartState().getName();
 		Set<State> reg1Finals = reg1.getFinalStates();
