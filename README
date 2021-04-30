@@ -1,0 +1,48 @@
+# Project 3: Regular Expressions
+
+* Author: Samantha Farmer and Taylor Nielson
+* Class: CS361 Section 1(Samantha) Section3(Taylor)
+* Semester: Spring 2021
+
+## Overview
+
+This program should construct an NFA from a given regular expression.
+
+## Included Files
+
+	*REDriver - driver class
+	*RE.java - regular expressions file
+	*README - this file
+
+
+## Compiling and Using
+
+TO compile and run the program, enter the following in the command line:
+
+	javac -cp ".:./CS361PA.jar" re/REDriver.java
+	java -cp ".:./CS361FA.jar" re.REDriver ./tests/[file name].txt
+
+## Discussion
+
+The given link in the project description definitely helped us with 
+building most of the methods in the RE class. At first, we did have some
+trouble with incorporating the JAR files because we were pushing through
+GitHub desktop and it was messing with our individual versions of it. Eventually
+we figured it out though and everything was working fine. In the RE class, we found
+that splitting each major function to get an NFA from regEx was the best way
+to keep our code clear and readable, so we have quite a few methods. Star was 
+probably the most challenging because you wanted as many of the star symbol and the
+character after it, in your regular expression. Recognizing a regular expression
+in code and then creating an NFA was definitely a challenge, but the sources
+given definitely helped a lot.
+
+## Testing
+
+To test our project we used the run configurations area of eclipse to
+test if our RE class was melding with the driver class. We then did a final test
+in the command line before submitting with the given compile and usage 
+instructions.
+
+## Sources used
+
+http://matt.might.net/articles/parsing-regex-with-recursive-decent/
